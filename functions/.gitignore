@@ -3,6 +3,7 @@
 # venv
 venv/*
 !venv/*.pth
+__pycache__
 
 # security key
 **/data/security/*.json
