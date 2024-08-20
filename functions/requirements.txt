@@ -3,3 +3,6 @@ firebase_functions~=0.1.0
 flask
 
 python-dotenv
+
+gspread
+oauth2client
