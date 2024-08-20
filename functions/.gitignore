@@ -2,3 +2,6 @@
 
 # venv
 venv/*
+
+# security key
+**/data/security/*.json
