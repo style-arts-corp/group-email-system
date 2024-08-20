@@ -2,6 +2,7 @@
 
 # venv
 venv/*
+!venv/*.pth
 
 # security key
 **/data/security/*.json
