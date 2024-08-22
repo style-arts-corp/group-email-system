@@ -1,13 +1,41 @@
-# Welcome to Cloud Functions for Firebase for Python!
-# To get started, simply uncomment the below code or create your own.
-# Deploy with `firebase deploy`
+# 環境変数の取得
+from dotenv import load_dotenv
+load_dotenv()
 
+import os
+
+from firebase_admin import initialize_app, db
 from firebase_functions import https_fn
-from firebase_admin import initialize_app
 
-# initialize_app()
-#
-#
-# @https_fn.on_request()
-# def on_request_example(req: https_fn.Request) -> https_fn.Response:
-#     return https_fn.Response("Hello world!")
+import flask
+from flask import jsonify
+from flask_cors import CORS
+
+initialize_app()
+app = flask.Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
+CORS(app)
+
+
+# for health check
+@app.route('/health', methods=['GET'])
+def get_health():
+    return "api is healthy", 200
+
+@app.route('/get_gspread_list', methods=['GET'])
+def get_gspread_list():
+    res = [
+        {
+            "title": "test",
+            "ID": os.getenv("TARGET_GSPREADID"),
+        }
+    ]
+    return jsonify(res), 200
+
+@https_fn.on_request()
+def api(req: https_fn.Request) -> https_fn.Response:
+    with app.request_context(req.environ):
+        return app.full_dispatch_request()
+
+if __name__ == '__main__':
+    app.run(debug=True)
