@@ -27,10 +27,14 @@ def get_gspread_list():
     res = [
         {
             "title": "test",
-            "ID": os.getenv("TARGET_GSPREADID"),
+            "id": os.getenv("TARGET_GSPREADID"),
         }
     ]
     return jsonify(res), 200
+
+@app.route('/get_gspread_data_by_id', methods=['POST'])
+def get_gspread_data_by_id():
+    pass
 
 @https_fn.on_request()
 def api(req: https_fn.Request) -> https_fn.Response:
