@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -16,8 +16,21 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import WarningDialog from './WarningDialog'; // パスは適切に調整してください
+import getGspreadList from '../../api/getGspreadList';
+
+type GspreadIMetaDataType = {
+  id: string;
+  title: string;
+};
+
+const isGspreadIMetaDataType = (arg: any): arg is GspreadIMetaDataType => {
+  return arg && typeof arg.id === 'string' && typeof arg.title === 'string';
+};
 
 const EmailForm: React.FC = () => {
+  const [gspreadList, setGspreadList] = useState<
+    (GspreadIMetaDataType | null)[]
+  >([]);
   const [recipient, setRecipient] = useState('');
   const [cc, setCc] = useState('');
   const [body, setBody] = useState('');
@@ -25,6 +38,15 @@ const EmailForm: React.FC = () => {
   const [errors, setErrors] = useState({ recipient: false, body: false });
   const [openWarning, setOpenWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getGspreadList();
+      console.log(data);
+      setGspreadList(data);
+    };
+    fetchData();
+  }, []);
 
   const handleRecipientChange = (event: SelectChangeEvent) => {
     setRecipient(event.target.value);
@@ -106,23 +128,22 @@ const EmailForm: React.FC = () => {
       onSubmit={handleSubmit}
     >
       <FormControl error={errors.recipient} margin="normal" fullWidth>
-        <InputLabel id="recipient-select-label">送信先</InputLabel>
+        <InputLabel id="recipient-select-label">
+          対象スプレッドシート
+        </InputLabel>
         <Select
           id="recipient-select"
-          label="送信先"
-          labelId="recipient-select-label"
           value={recipient}
+          label="対象スプレッドシート"
           onChange={handleRecipientChange}
         >
-          <MenuItem value="recipient1@example.com">
-            recipient1@example.com
-          </MenuItem>
-          <MenuItem value="recipient2@example.com">
-            recipient2@example.com
-          </MenuItem>
-          <MenuItem value="recipient3@example.com">
-            recipient3@example.com
-          </MenuItem>
+          {gspreadList.map((item: GspreadIMetaDataType | null, index) =>
+            isGspreadIMetaDataType(item) ? (
+              <MenuItem key={index} value={item.id}>
+                {item.title}
+              </MenuItem>
+            ) : null,
+          )}
         </Select>
         {errors.recipient && (
           <Typography color="error">送信先を選択してください</Typography>
