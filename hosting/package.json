@@ -2,6 +2,12 @@
   "name": "hosting",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x",
+    "pnpm": "9.x",
+    "yarn": "Please use pnpm!",
+    "npm": "Please use pnpm!"
+  },
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
