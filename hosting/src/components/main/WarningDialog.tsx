@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 import type React from 'react';
 import {
   Dialog,
@@ -18,17 +19,17 @@ interface WarningDialogProps {
 const WarningDialog: React.FC<WarningDialogProps> = ({
   open,
   message,
-  onClose,
-  onConfirm,
+  onClose: handleClose,
+  onConfirm: handleConfirm,
 }) => (
-  <Dialog open={open} onClose={onClose}>
+  <Dialog open={open} onClose={handleClose}>
     <DialogTitle>警告</DialogTitle>
     <DialogContent>
       <DialogContentText>{message}</DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button onClick={onClose}>キャンセル</Button>
-      <Button autoFocus onClick={onConfirm}>
+      <Button onClick={handleClose}>キャンセル</Button>
+      <Button autoFocus onClick={handleConfirm}>
         送信
       </Button>
     </DialogActions>

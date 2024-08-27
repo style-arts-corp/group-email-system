@@ -1,13 +1,13 @@
+import type React from 'react';
 import './App.css';
-
 import Header from './components/header/Header';
 import Main from './components/main/Main';
 
-const App = () => (
-    <div className="App">
-      <Header/>
-      <Main/>
-    </div>
-  )
+const App: React.FC = () => (
+  <div className="App">
+    <Header />
+    <Main />
+  </div>
+);
 
 export default App;

@@ -41,12 +41,14 @@ const EmailForm: React.FC = () => {
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFiles((prevFiles) => [
-        ...prevFiles,
-        ...Array.from(event.target.files!),
-      ]);
-    }
+    if (event.target.files === null) return;
+
+    setFiles((prevFiles) => {
+      const newFiles = event.target.files;
+      if (newFiles === null) return prevFiles;
+
+      return [...prevFiles, ...Array.from(newFiles)];
+    });
   };
 
   const handleRemoveFile = (fileToRemove: File) => {
@@ -151,11 +153,12 @@ const EmailForm: React.FC = () => {
 
       <Box sx={{ mt: 2, mb: 2 }}>
         <Stack direction="row" flexWrap="wrap" spacing={1}>
-          {files.map((file, index) => (
+          {files.map((file) => (
             <Chip
-              key={index}
+              key={file.name}
               label={file.name}
               sx={{ mb: 1 }}
+              // eslint-disable-next-line react/jsx-handler-names
               onDelete={() => {
                 handleRemoveFile(file);
               }}
