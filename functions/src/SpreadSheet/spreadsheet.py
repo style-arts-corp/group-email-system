@@ -19,9 +19,11 @@ DATA_POS = {
 }
 
 class SpreadSheet:
-    def __init__(self):
+    def __init__(self, id=None):
         # クライアントの作成
         self.client = gspread.authorize(CREDS)
+        if id != None:
+            self.set_spread_sheet_by_key(id)
 
     #################### ▼ set ▼ ####################
     def set_spread_sheet_by_key(self, key:str):
