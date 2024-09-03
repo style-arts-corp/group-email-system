@@ -8,8 +8,10 @@ from firebase_admin import initialize_app, db
 from firebase_functions import https_fn
 
 import flask
-from flask import jsonify
+from flask import request, jsonify
 from flask_cors import CORS
+
+from src.SpreadSheet.spreadsheet import SpreadSheet
 
 initialize_app()
 app = flask.Flask(__name__)
@@ -34,7 +36,16 @@ def get_gspread_list():
 
 @app.route('/get_gspread_data_by_id', methods=['POST'])
 def get_gspread_data_by_id():
-    pass
+    if request.method != "POST":
+        return "method not allowed", 405
+    data = request.get_json()
+    if not data or 'spread_sheet_id' not in data:
+        return "Missing spread_sheet_id in JSON body", 400
+    id = data['spread_sheet_id']
+    print("id: ", id)
+    spread_sheet = SpreadSheet(id=id)
+    data = spread_sheet.get_data()
+    return jsonify(data), 200
 
 @https_fn.on_request()
 def api(req: https_fn.Request) -> https_fn.Response:
