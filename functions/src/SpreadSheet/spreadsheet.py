@@ -3,7 +3,7 @@ import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-from constants.path import PATHS
+from src.constants.path import PATHS
 
 # 認証情報の設定
 security_key_path = os.path.join(PATHS["security"], "for_drive-gspread.json")
