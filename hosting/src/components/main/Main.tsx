@@ -17,19 +17,33 @@ import SendIcon from '@mui/icons-material/Send';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import WarningDialog from './WarningDialog'; // パスは適切に調整してください
 import getGspreadList from '../../api/getGspreadList';
+import getGspreadDataByID from '../../api/getGspreadDataByID';
 
+// ========== ▼ スプシメタデータに関する定義 ▼ ==========
 type GspreadIMetaDataType = {
   id: string;
   title: string;
 };
-
 const isGspreadIMetaDataType = (arg: any): arg is GspreadIMetaDataType => {
   return arg && typeof arg.id === 'string' && typeof arg.title === 'string';
 };
+// ========== ▲ スプシメタデータに関する定義 ▲ ==========
+
+// ========== ▼ EmailFormコンポーネントの定義 ▼ ==========
+type TargetAddressDataType = {
+  name: string;
+  company: string;
+  role: string;
+  email: string;
+};
+// ========== ▲ EmailFormコンポーネントの定義 ▲ ==========
 
 const EmailForm: React.FC = () => {
   const [gspreadList, setGspreadList] = useState<
     (GspreadIMetaDataType | null)[]
+  >([]);
+  const [targetAddressList, setTargetAddressList] = useState<
+    (TargetAddressDataType | null)[]
   >([]);
   const [recipient, setRecipient] = useState('');
   const [cc, setCc] = useState('');
@@ -47,6 +61,16 @@ const EmailForm: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  const handleGspreadChange = (event: SelectChangeEvent) => {
+    const fetchData = async (id: string) => {
+      const data = await getGspreadDataByID(id);
+      console.log(data);
+      setTargetAddressList(data);
+    };
+    const gspreadID = event.target.value;
+    fetchData(gspreadID);
+  };
 
   const handleRecipientChange = (event: SelectChangeEvent) => {
     setRecipient(event.target.value);
@@ -135,7 +159,7 @@ const EmailForm: React.FC = () => {
           id="recipient-select"
           value={recipient}
           label="対象スプレッドシート"
-          onChange={handleRecipientChange}
+          onChange={handleGspreadChange}
         >
           {gspreadList.map((item: GspreadIMetaDataType | null, index) =>
             isGspreadIMetaDataType(item) ? (
