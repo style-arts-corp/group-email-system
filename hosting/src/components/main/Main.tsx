@@ -10,11 +10,11 @@ import {
   TextField,
   Stack,
   Chip,
-  Typography,
+  type SelectChangeEvent,
 } from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
-import type { SelectChangeEvent } from '@mui/material/Select';
+import AddIcon from '@mui/icons-material/Add';
 import WarningDialog from './WarningDialog'; // パスは適切に調整してください
 import getGspreadList from '../../api/getGspreadList';
 import getGspreadDataByID from '../../api/getGspreadDataByID';
@@ -51,6 +51,10 @@ const EmailForm: React.FC = () => {
   >([]);
   const [recipient, setRecipient] = useState('');
   const [cc, setCc] = useState('');
+
+  const [ccList, setCcList] = useState<string[]>([]);
+  const [newCc, setNewCc] = useState('');
+
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -88,6 +92,21 @@ const EmailForm: React.FC = () => {
 
   const handleCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCc(event.target.value);
+  };
+
+  const handleAddCc = () => {
+    if (newCc.trim() !== '' && !ccList.includes(newCc.trim())) {
+      setCcList([...ccList, newCc.trim()]);
+      setNewCc('');
+    }
+  };
+
+  const handleRemoveCc = (ccToRemove: string) => {
+    setCcList(ccList.filter((cc) => cc !== ccToRemove));
+  };
+
+  const handleNewCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewCc(event.target.value);
   };
 
   const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,14 +201,38 @@ const EmailForm: React.FC = () => {
         {/* {errors.recipient && <Typography color="error">送信先を選択してください</Typography>} */}
       </FormControl>
 
-      <TextField
-        id="cc"
-        label="CC"
-        margin="normal"
-        value={cc}
-        fullWidth
-        onChange={handleCcChange}
-      />
+      <Box sx={{ mt: 1 }}>
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', mt: 1, mb: 1 }}
+          justifyContent="space-between"
+        >
+          <TextField
+            fullWidth
+            size="small"
+            value={newCc}
+            onChange={handleNewCcChange}
+            placeholder="CC用アドレス"
+            sx={{ mr: 1, width: 450 }}
+          />
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={handleAddCc}
+          >
+            追加
+          </Button>
+        </Box>
+        <Stack direction="row" spacing={1} flexWrap="wrap">
+          {ccList.map((cc, index) => (
+            <Chip
+              key={index}
+              label={cc}
+              onDelete={() => handleRemoveCc(cc)}
+              sx={{ mb: 1 }}
+            />
+          ))}
+        </Stack>
+      </Box>
 
       <TextField
         fullWidth
@@ -230,10 +273,11 @@ const EmailForm: React.FC = () => {
       </Box>
 
       <Stack
-        alignItems="center"
         direction="row"
+        spacing={1}
         justifyContent="space-between"
-        spacing={2}
+        alignItems="center"
+        paddingBottom="10%"
       >
         <Button
           component="label"
