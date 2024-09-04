@@ -43,7 +43,7 @@ def get_gspread_data_by_id():
     if not data or 'spread_sheet_id' not in data:
         return "Missing spread_sheet_id in JSON body", 400
     id = data['spread_sheet_id']
-    print("id: ", id)
+    print(f"gspread id: {id}")
     spread_sheet = SpreadSheet(id=id)
     data = spread_sheet.get_data()
     return jsonify(data), 200
@@ -56,11 +56,23 @@ def process_send_email():
     if not data or 'target_list' not in data:
         return "Missing email in JSON body", 400
     target_list = data['target_list']
+    print(f"target_list: {target_list}")
+    cc_list = data["cc_list"]
+    print(f"cc_list: {cc_list}")
     subject = data["subject"]
+    print(f"subject: {subject}")
     content = data['content']
+    print(f"content: {content}")
     for target in target_list:
         send_text = content.replace("{company}", target["company"]).replace("{name}", target["name"]).replace("{role}", target["role"])
-        send_email(os.getenv("SENDER_EMAIL"), os.getenv("SENDER_PASSWORD"), target["email"], subject, send_text)
+        send_email(
+            os.getenv("SENDER_EMAIL"),
+            os.getenv("SENDER_PASSWORD"),
+            target["email"],
+            cc_list,
+            subject,
+            send_text
+        )
     return "complete", 200
 
 @https_fn.on_request()
