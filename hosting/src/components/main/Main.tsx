@@ -89,7 +89,7 @@ const EmailForm: React.FC = () => {
 
   const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSubject(event.target.value);
-  }
+  };
 
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
@@ -131,9 +131,10 @@ const EmailForm: React.FC = () => {
     // ここで実際のメール送信処理を実装します
     const pushData = async () => {
       console.log(targetAddressList);
+      console.log(subject);
       console.log(body);
       // ここでsendEmailのAPIを叩く処理を実装します
-      await processToSendEmail(targetAddressList, body);
+      await processToSendEmail(targetAddressList, subject, body);
     };
     console.log('メールを送信:', { targetAddressList, cc, body, files });
     pushData();
