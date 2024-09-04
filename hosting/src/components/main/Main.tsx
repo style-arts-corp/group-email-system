@@ -44,6 +44,7 @@ const EmailForm: React.FC = () => {
   const [targetAddressList, setTargetAddressList] = useState<(TargetAddressDataType | null)[]>([]);
   const [recipient, setRecipient] = useState('');
   const [cc, setCc] = useState('');
+  const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState({ recipient: false, body: false });
@@ -79,6 +80,10 @@ const EmailForm: React.FC = () => {
   const handleCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCc(event.target.value);
   };
+
+  const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSubject(event.target.value);
+  }
 
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
@@ -158,6 +163,15 @@ const EmailForm: React.FC = () => {
         label="CC"
         value={cc}
         onChange={handleCcChange}
+      />
+
+      <TextField
+        fullWidth
+        margin="normal"
+        id="subject"
+        label="件名"
+        value={subject}
+        onChange={handleSubjectChange}
       />
 
       <TextField
