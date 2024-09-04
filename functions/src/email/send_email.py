@@ -6,12 +6,14 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-def send_email(sender_email, sender_password, receiver_email, subject, body):
+def send_email(sender_email, sender_password, receiver_email, cc_list, subject, body):
     # メッセージの作成
     message = MIMEMultipart()
     message["From"] = sender_email
     message["To"] = receiver_email
     message["Subject"] = subject
+    if cc_list:
+        message["Cc"] = ", ".join(cc_list)
 
     # 本文の追加
     message.attach(MIMEText(body, "plain"))
