@@ -144,7 +144,7 @@ const EmailForm: React.FC = () => {
       console.log(subject)
       console.log(body)
       // ここでsendEmailのAPIを叩く処理を実装します
-      await processToSendEmail(targetAddressList, subject, body)
+      await processToSendEmail(targetAddressList, ccList, subject, body)
       showSuccessDialog();
     }
     console.log('メールを送信:', { targetAddressList, cc, body, files });
