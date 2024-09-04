@@ -56,10 +56,10 @@ def process_send_email():
     if not data or 'target_list' not in data:
         return "Missing email in JSON body", 400
     target_list = data['target_list']
+    subject = data["subject"]
     content = data['content']
     for target in target_list:
         send_text = content.replace("{company}", target["company"]).replace("{name}", target["name"]).replace("{role}", target["role"])
-        subject = "「WorkSmart」について"
         send_email(os.getenv("SENDER_EMAIL"), os.getenv("SENDER_PASSWORD"), target["email"], subject, send_text)
     return "complete", 200
 
