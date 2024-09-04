@@ -19,6 +19,7 @@ import WarningDialog from './WarningDialog'; // パスは適切に調整して�
 import getGspreadList from '../../api/getGspreadList';
 import getGspreadDataByID from '../../api/getGspreadDataByID';
 import processToSendEmail from '../../api/processToSendEmail';
+import useSuccessDialog from './SuccessDialog';
 
 // ========== ▼ スプシメタデータに関する定義 ▼ ==========
 type GspreadIMetaDataType = {
@@ -56,6 +57,8 @@ const EmailForm: React.FC = () => {
   const [errors, setErrors] = useState({ recipient: false, body: false });
   const [openWarning, setOpenWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
+
+  const { SuccessDialog, showSuccessDialog } = useSuccessDialog();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,6 +138,7 @@ const EmailForm: React.FC = () => {
       console.log(body);
       // ここでsendEmailのAPIを叩く処理を実装します
       await processToSendEmail(targetAddressList, subject, body);
+      showSuccessDialog();
     };
     console.log('メールを送信:', { targetAddressList, cc, body, files });
     pushData();
@@ -207,14 +211,6 @@ const EmailForm: React.FC = () => {
         onChange={handleBodyChange}
         error={errors.body}
         helperText={errors.body ? '本文を入力してください' : ''}
-        id="body"
-        label="本文"
-        margin="normal"
-        rows={4}
-        value={body}
-        fullWidth
-        multiline
-        onChange={handleBodyChange}
       />
 
       <Box sx={{ mt: 2, mb: 2 }}>
@@ -259,6 +255,8 @@ const EmailForm: React.FC = () => {
         onClose={handleCloseWarning}
         onConfirm={handleConfirmSend}
       />
+
+      <SuccessDialog />
     </Box>
   );
 };
