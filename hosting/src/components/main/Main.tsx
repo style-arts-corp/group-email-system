@@ -17,6 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import WarningDialog from './WarningDialog';  // パスは適切に調整してください
 import getGspreadList from '../../api/getGspreadList';
 import getGspreadDataByID from '../../api/getGspreadDataByID';
+import processToSendEmail from '../../api/processToSendEmail';
 
 // ========== ▼ スプシメタデータに関する定義 ▼ ==========
 type GspreadIMetaDataType = {
@@ -29,7 +30,7 @@ const isGspreadIMetaDataType = (arg: any): arg is GspreadIMetaDataType => {
 // ========== ▲ スプシメタデータに関する定義 ▲ ==========
 
 // ========== ▼ EmailFormコンポーネントの定義 ▼ ==========
-type TargetAddressDataType  = {
+export type TargetAddressDataType  = {
   name: string;
   company: string;
   role: string;
@@ -38,7 +39,8 @@ type TargetAddressDataType  = {
 // ========== ▲ EmailFormコンポーネントの定義 ▲ ==========
 
 const EmailForm: React.FC = () => {
-  const [gspreadList, setGspreadList] = useState<(GspreadIMetaDataType | null)[]>([])
+  const [gspreadList, setGspreadList] = useState<GspreadIMetaDataType[] | null>([])
+  const [targetGspreadData, setTargetGspreadData] = useState<GspreadIMetaDataType | null>();
   const [targetAddressList, setTargetAddressList] = useState<(TargetAddressDataType | null)[]>([]);
   const [recipient, setRecipient] = useState('');
   const [cc, setCc] = useState('');
@@ -64,6 +66,8 @@ const EmailForm: React.FC = () => {
       setTargetAddressList(data);
     }
     const gspreadID = event.target.value;
+    if (gspreadList === null) return;
+    setTargetGspreadData(gspreadList.find(item => item.id === gspreadID));
     fetchData(gspreadID)
   };
 
@@ -102,25 +106,20 @@ const EmailForm: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (validateForm()) {
-      if (cc.trim() === '' && files.length === 0) {
-        setWarningMessage('CCと添付ファイルが設定されていません。続行しますか？');
-        setOpenWarning(true);
-      } else if (cc.trim() === '') {
-        setWarningMessage('CCが設定されていません。続行しますか？');
-        setOpenWarning(true);
-      } else if (files.length === 0) {
-        setWarningMessage('添付ファイルが設定されていません。続行しますか？');
-        setOpenWarning(true);
-      } else {
-        sendEmail();
-      }
-    }
+    console.log('メールを送信');
+    sendEmail();
   };
 
   const sendEmail = () => {
     // ここで実際のメール送信処理を実装します
-    console.log('メールを送信:', { recipient, cc, body, files });
+    const pushData = async () => {
+      console.log(targetAddressList)
+      console.log(body)
+      // ここでsendEmailのAPIを叩く処理を実装します
+      await processToSendEmail(targetAddressList, body)
+    }
+    console.log('メールを送信:', { targetAddressList, cc, body, files });
+    pushData()
   };
 
   const handleCloseWarning = () => {
@@ -134,22 +133,22 @@ const EmailForm: React.FC = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 600, margin: 'auto', mt: 4 }}>
-      <FormControl fullWidth margin="normal" error={errors.recipient}>
+      <FormControl fullWidth margin="normal">
         <InputLabel id="recipient-select-label">対象スプレッドシート</InputLabel>
         <Select
           labelId="recipient-select-label"
           id="recipient-select"
-          value={recipient}
+          value={targetGspreadData? targetGspreadData.id : ''}
           label="対象スプレッドシート"
           onChange={handleGspreadChange}
         >
           {
-            gspreadList.map((item:GspreadIMetaDataType | null, index) => (
+            (gspreadList !== null) ? gspreadList.map((item:GspreadIMetaDataType | null, index) => (
               isGspreadIMetaDataType(item) ? <MenuItem key={index} value={item.id}>{item.title}</MenuItem> : null
-            ))
+            )) : null
           }
-          </Select>
-        {errors.recipient && <Typography color="error">送信先を選択してください</Typography>}
+        </Select>
+        {/* {errors.recipient && <Typography color="error">送信先を選択してください</Typography>} */}
       </FormControl>
 
       <TextField
@@ -167,7 +166,7 @@ const EmailForm: React.FC = () => {
         id="body"
         label="本文"
         multiline
-        rows={4}
+        rows={15}
         value={body}
         onChange={handleBodyChange}
         error={errors.body}
