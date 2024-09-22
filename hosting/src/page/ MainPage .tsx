@@ -1,11 +1,11 @@
 import Header from "../components/header/Header";
-import Main from "../components/main/Main";
+import EmailForm from "../components/emailForm/EmailForm";
 
 const MainPage = () => {
   return (
   <>
     <Header />
-    <Main/>
+    <EmailForm/>
   </>
   );
 }
