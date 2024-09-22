@@ -12,6 +12,8 @@ import {
   Container,
   Alert,
 } from '@mui/material';
+import useLoginErrorDialog from './LoginErrorDialog';
+
 interface LoginData {
   email: string;
   password: string;
@@ -35,6 +37,9 @@ const LoginForm: React.FC = () => {
     email: '',
     password: '',
   });
+  const [error, setError] = useState<string | null>(null);
+
+  const {LoginErrorDialog, showLoginErrorDialog} = useLoginErrorDialog();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,11 +51,14 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);  // Reset any previous errors
     try {
       await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
       console.log('Login successful');
       // ここでログイン成功後の処理を実装します（例：ホーム画面へのリダイレクト）
     } catch (error) {
+      showLoginErrorDialog();
+      setError('メールアドレスとパスワードを確認してください。');
       console.error('Login error:', error);
     }
   };
@@ -67,6 +75,11 @@ const LoginForm: React.FC = () => {
         <Typography component="h1" variant="h5">
           ログイン
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+            {error}
+          </Alert>
+        )}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
           <TextField
             margin="normal"
@@ -102,6 +115,7 @@ const LoginForm: React.FC = () => {
           </Button>
         </Box>
       </Box>
+      <LoginErrorDialog />
     </Container>
   );
 };
