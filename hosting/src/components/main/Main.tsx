@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -9,21 +9,75 @@ import {
   TextField,
   Stack,
   Chip,
-  Typography,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
+import AddIcon from '@mui/icons-material/Add';
 import WarningDialog from './WarningDialog';  // パスは適切に調整してください
+import getGspreadList from '../../api/getGspreadList';
+import getGspreadDataByID from '../../api/getGspreadDataByID';
+import processToSendEmail from '../../api/processToSendEmail';
+import useSuccessDialog from './SuccessDialog';
+
+// ========== ▼ スプシメタデータに関する定義 ▼ ==========
+type GspreadIMetaDataType = {
+  id: string;
+  title: string;
+};
+const isGspreadIMetaDataType = (arg: any): arg is GspreadIMetaDataType => {
+  return arg && typeof arg.id === 'string' && typeof arg.title === 'string';
+}
+// ========== ▲ スプシメタデータに関する定義 ▲ ==========
+
+// ========== ▼ EmailFormコンポーネントの定義 ▼ ==========
+export type TargetAddressDataType  = {
+  name: string;
+  company: string;
+  role: string;
+  email: string;
+}
+// ========== ▲ EmailFormコンポーネントの定義 ▲ ==========
 
 const EmailForm: React.FC = () => {
+  const [gspreadList, setGspreadList] = useState<GspreadIMetaDataType[] | null>([])
+  const [targetGspreadData, setTargetGspreadData] = useState<GspreadIMetaDataType | null>();
+  const [targetAddressList, setTargetAddressList] = useState<(TargetAddressDataType | null)[]>([]);
   const [recipient, setRecipient] = useState('');
   const [cc, setCc] = useState('');
+
+  const [ccList, setCcList] = useState<string[]>([]);
+  const [newCc, setNewCc] = useState('');
+
+  const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState({ recipient: false, body: false });
   const [openWarning, setOpenWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
+
+  const {SuccessDialog, showSuccessDialog} = useSuccessDialog();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getGspreadList();
+      console.log(data);
+      setGspreadList(data);
+    }
+    fetchData();
+  }, []);
+
+  const handleGspreadChange = (event: SelectChangeEvent) => {
+    const fetchData = async (id: string) => {
+      const data = await getGspreadDataByID(id);
+      console.log(data)
+      setTargetAddressList(data);
+    }
+    const gspreadID = event.target.value;
+    if (gspreadList === null) return;
+    setTargetGspreadData(gspreadList.find(item => item.id === gspreadID));
+    fetchData(gspreadID)
+  };
 
   const handleRecipientChange = (event: SelectChangeEvent) => {
     setRecipient(event.target.value as string);
@@ -33,6 +87,25 @@ const EmailForm: React.FC = () => {
   const handleCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCc(event.target.value);
   };
+
+  const handleAddCc = () => {
+    if (newCc.trim() !== '' && !ccList.includes(newCc.trim())) {
+      setCcList([...ccList, newCc.trim()]);
+      setNewCc('');
+    }
+  };
+
+  const handleRemoveCc = (ccToRemove: string) => {
+    setCcList(ccList.filter(cc => cc !== ccToRemove));
+  };
+
+  const handleNewCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewCc(event.target.value);
+  };
+
+  const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSubject(event.target.value);
+  }
 
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
@@ -60,25 +133,22 @@ const EmailForm: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (validateForm()) {
-      if (cc.trim() === '' && files.length === 0) {
-        setWarningMessage('CCと添付ファイルが設定されていません。続行しますか？');
-        setOpenWarning(true);
-      } else if (cc.trim() === '') {
-        setWarningMessage('CCが設定されていません。続行しますか？');
-        setOpenWarning(true);
-      } else if (files.length === 0) {
-        setWarningMessage('添付ファイルが設定されていません。続行しますか？');
-        setOpenWarning(true);
-      } else {
-        sendEmail();
-      }
-    }
+    console.log('メールを送信');
+    sendEmail();
   };
 
   const sendEmail = () => {
     // ここで実際のメール送信処理を実装します
-    console.log('メールを送信:', { recipient, cc, body, files });
+    const pushData = async () => {
+      console.log(targetAddressList)
+      console.log(subject)
+      console.log(body)
+      // ここでsendEmailのAPIを叩く処理を実装します
+      await processToSendEmail(targetAddressList, ccList, subject, body)
+      showSuccessDialog();
+    }
+    console.log('メールを送信:', { targetAddressList, cc, body, files });
+    pushData()
   };
 
   const handleCloseWarning = () => {
@@ -92,29 +162,61 @@ const EmailForm: React.FC = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 600, margin: 'auto', mt: 4 }}>
-      <FormControl fullWidth margin="normal" error={errors.recipient}>
-        <InputLabel id="recipient-select-label">送信先</InputLabel>
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="recipient-select-label">対象スプレッドシート</InputLabel>
         <Select
           labelId="recipient-select-label"
           id="recipient-select"
-          value={recipient}
-          label="送信先"
-          onChange={handleRecipientChange}
+          value={targetGspreadData? targetGspreadData.id : ''}
+          label="対象スプレッドシート"
+          onChange={handleGspreadChange}
         >
-          <MenuItem value="recipient1@example.com">recipient1@example.com</MenuItem>
-          <MenuItem value="recipient2@example.com">recipient2@example.com</MenuItem>
-          <MenuItem value="recipient3@example.com">recipient3@example.com</MenuItem>
+          {
+            (gspreadList !== null) ? gspreadList.map((item:GspreadIMetaDataType | null, index) => (
+              isGspreadIMetaDataType(item) ? <MenuItem key={index} value={item.id}>{item.title}</MenuItem> : null
+            )) : null
+          }
         </Select>
-        {errors.recipient && <Typography color="error">送信先を選択してください</Typography>}
+        {/* {errors.recipient && <Typography color="error">送信先を選択してください</Typography>} */}
       </FormControl>
+
+      <Box sx={{ mt: 1 }} >
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 , mb:1}} justifyContent="space-between">
+        <TextField
+            fullWidth
+            size="small"
+            value={newCc}
+            onChange={handleNewCcChange}
+            placeholder="CC用アドレス"
+            sx={{ mr: 1, width: 450 }}
+          />
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={handleAddCc}
+          >
+            追加
+          </Button>
+        </Box>
+        <Stack direction="row" spacing={1} flexWrap="wrap">
+          {ccList.map((cc, index) => (
+            <Chip
+              key={index}
+              label={cc}
+              onDelete={() => handleRemoveCc(cc)}
+              sx={{ mb: 1 }}
+            />
+          ))}
+        </Stack>
+      </Box>
 
       <TextField
         fullWidth
         margin="normal"
-        id="cc"
-        label="CC"
-        value={cc}
-        onChange={handleCcChange}
+        id="subject"
+        label="件名"
+        value={subject}
+        onChange={handleSubjectChange}
       />
 
       <TextField
@@ -123,7 +225,7 @@ const EmailForm: React.FC = () => {
         id="body"
         label="本文"
         multiline
-        rows={4}
+        rows={15}
         value={body}
         onChange={handleBodyChange}
         error={errors.body}
@@ -143,7 +245,7 @@ const EmailForm: React.FC = () => {
         </Stack>
       </Box>
 
-      <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
+      <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center" paddingBottom="10%">
         <Button
           component="label"
           variant="outlined"
@@ -173,6 +275,8 @@ const EmailForm: React.FC = () => {
         onClose={handleCloseWarning}
         onConfirm={handleConfirmSend}
       />
+
+      <SuccessDialog />
     </Box>
   );
 };
