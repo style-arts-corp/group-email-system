@@ -1,11 +1,20 @@
 import Header from "../components/header/Header";
 import EmailForm from "../components/emailForm/EmailForm";
+import { useAuth } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 const MainPage = () => {
+  const {user, error} = useAuth();
+
   return (
   <>
-    <Header />
-    <EmailForm/>
+    {user?
+      <>
+        <Header />
+        <EmailForm/>
+      </>:
+      <Navigate to={"/login"} />
+    }
   </>
   );
 }
