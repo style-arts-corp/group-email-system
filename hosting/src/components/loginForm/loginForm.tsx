@@ -1,5 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import { Navigate } from "react-router-dom";
+import React, { useState, ChangeEvent} from 'react';
 import {
   Button,
   TextField,
@@ -8,7 +7,6 @@ import {
   Container,
   Alert,
 } from '@mui/material';
-import useLoginErrorDialog from './LoginErrorDialog';
 import { useAuth } from '../../context/AuthContext';
 
 interface LoginData {
@@ -23,9 +21,6 @@ const LoginForm: React.FC = () => {
     email: '',
     password: '',
   });
-  // const [error, setError] = useState<string | null>(null);
-
-  const {LoginErrorDialog, showLoginErrorDialog} = useLoginErrorDialog();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -92,7 +87,6 @@ const LoginForm: React.FC = () => {
           </Button>
         </Box>
       </Box>
-      <LoginErrorDialog />
     </Container>
   );
 };
