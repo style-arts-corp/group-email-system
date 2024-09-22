@@ -1,3 +1,8 @@
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 import React, { useState, ChangeEvent } from 'react';
 import {
   Button,
@@ -5,12 +10,25 @@ import {
   Box,
   Typography,
   Container,
+  Alert,
 } from '@mui/material';
-
 interface LoginData {
   email: string;
   password: string;
 }
+
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
 
 const LoginForm: React.FC = () => {
   const [loginData, setLoginData] = useState<LoginData>({
@@ -26,10 +44,15 @@ const LoginForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Login attempt:', loginData);
-    // ここでログイン処理を実装します（例：APIリクエスト）
+    try {
+      await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
+      console.log('Login successful');
+      // ここでログイン成功後の処理を実装します（例：ホーム画面へのリダイレクト）
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
