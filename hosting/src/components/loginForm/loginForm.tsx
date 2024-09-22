@@ -2,8 +2,9 @@ import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   signInWithEmailAndPassword,
+  onAuthStateChanged
 } from 'firebase/auth';
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import {
   Button,
   TextField,
@@ -62,6 +63,18 @@ const LoginForm: React.FC = () => {
       console.error('Login error:', error);
     }
   };
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log('User is signed in');
+        console.log(user);
+        // ここでログイン成功後の処理を実装します（例：ホーム画面へのリダイレクト）
+      } else {
+        console.log('User is signed out');
+      }
+    });
+  });
 
   return (
     <Container component="main" maxWidth="xs" sx={{margin: 'auto', mt: "10%" }}>
