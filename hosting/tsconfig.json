@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
+    "types": ["vitest/globals"],
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": true,
@@ -23,5 +24,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "*.ts", "*.tsx"]
+  "include": ["src", "*.ts", "*.tsx"],
+  "exclude": ["vite.config.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
