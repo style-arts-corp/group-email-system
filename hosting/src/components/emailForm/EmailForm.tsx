@@ -15,9 +15,9 @@ import AddIcon from '@mui/icons-material/Add';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import type { SelectChangeEvent } from '@mui/material/Select';
-import getGspreadDataByID from '../../api/getGspreadDataByID';
-import getGspreadList from '../../api/getGspreadList';
-import processToSendEmail from '../../api/processToSendEmail';
+import getGspreadDataByID from '@/api/getGspreadDataByID';
+import getGspreadList from '@/api/getGspreadList';
+import processToSendEmail from '@/api/processToSendEmail';
 import useSuccessDialog from './SuccessDialog';
 import WarningDialog from './WarningDialog'; // パスは適切に調整してください
 
@@ -59,7 +59,7 @@ const EmailForm: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState({ recipient: false, body: false });
   const [openWarning, setOpenWarning] = useState(false);
-  const [warningMessage, setWarningMessage] = useState('');
+  const [warningMessage] = useState('');
 
   const { SuccessDialog, showSuccessDialog } = useSuccessDialog();
 
