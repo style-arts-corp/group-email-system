@@ -1,13 +1,11 @@
-import Header from "../components/header/Header";
-import EmailForm from "../components/emailForm/EmailForm";
+import EmailForm from '../components/emailForm/EmailForm';
+import Header from '../components/header/Header';
 
-const MainPage = () => {
-  return (
+const MainPage = () => (
   <>
     <Header />
-    <EmailForm/>
+    <EmailForm />
   </>
-  );
-}
+);
 
 export default MainPage;
