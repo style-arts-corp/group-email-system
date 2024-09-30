@@ -1,4 +1,4 @@
-import type { TargetAddressDataType } from '../components/main/Main';
+import type { TargetAddressDataType } from '@/components/emailForm/EmailForm';
 import apiClient from './apiClient';
 
 type EmailDataType = {
