@@ -4,7 +4,7 @@ import LoginForm from "../components/loginForm/loginForm";
 import { useAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
-  const {user, error} = useAuth();
+  const {user} = useAuth();
   return (
     <>
       {user?
