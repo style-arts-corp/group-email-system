@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { Snackbar, Alert, SnackbarCloseReason, Slide, SlideProps } from '@mui/material';
+import type React from 'react';
+import { useState } from 'react';
+import type { SnackbarCloseReason, SlideProps } from '@mui/material';
+import { Snackbar, Alert, Slide } from '@mui/material';
 import { CheckCircle } from 'lucide-react';
 
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
-const SlideTransition = (props: TransitionProps) => {
-  return <Slide {...props} direction="right" />;
-};
+const SlideTransition = (props: TransitionProps) => (
+  <Slide {...props} direction="right" />
+);
 
 interface UseSuccessDialogReturn {
   showSuccessDialog: () => void;
@@ -20,7 +22,10 @@ const useSuccessDialog = (): UseSuccessDialogReturn => {
     setOpen(true);
   };
 
-  const handleClose = (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason): void => {
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ): void => {
     if (reason === 'clickaway') {
       return;
     }
@@ -29,17 +34,17 @@ const useSuccessDialog = (): UseSuccessDialogReturn => {
 
   const SuccessDialog: React.FC = () => (
     <Snackbar
-      open={open}
-      autoHideDuration={3000}
-      onClose={handleClose}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       TransitionComponent={SlideTransition}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      autoHideDuration={3000}
+      open={open}
+      onClose={handleClose}
     >
       <Alert
-        onClose={handleClose}
+        icon={<CheckCircle className="text-green-500" size={24} />}
         severity="success"
         sx={{ width: '100%' }}
-        icon={<CheckCircle className="text-green-500" size={24} />}
+        onClose={handleClose}
       >
         操作が成功しました
       </Alert>

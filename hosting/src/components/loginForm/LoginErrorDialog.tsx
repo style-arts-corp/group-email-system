@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Snackbar, Alert, SnackbarCloseReason, Slide, SlideProps } from '@mui/material';
+import { Snackbar, Alert, Slide } from '@mui/material';
+import type { SnackbarCloseReason, SlideProps } from '@mui/material';
 import { CheckCircle } from 'lucide-react';
 
 type TransitionProps = Omit<SlideProps, 'direction'>;
@@ -20,7 +21,10 @@ const useLoginErrorDialog = (): UseLoginErrorDialogReturn => {
     setOpen(true);
   };
 
-  const handleClose = (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason): void => {
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ): void => {
     if (reason === 'clickaway') {
       return;
     }

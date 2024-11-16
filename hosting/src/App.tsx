@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import './App.css';
 
-import MainPage from './page/ MainPage ';
-import LoginPage from './page/ LoginPage';
+import MainPage from '@/page/MainPage';
+import LoginPage from '@/page/LoginPage';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -13,8 +13,8 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path={'/'} element={<MainPage/>} />
-            <Route path={'/login'} element={<LoginPage/>} />
+            <Route path={'/'} element={<MainPage />} />
+            <Route path={'/login'} element={<LoginPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

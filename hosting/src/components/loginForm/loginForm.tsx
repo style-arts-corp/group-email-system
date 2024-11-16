@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent} from 'react';
+import React, { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import {
   Button,
   TextField,
@@ -15,7 +16,7 @@ interface LoginData {
 }
 
 const LoginForm: React.FC = () => {
-  const {error, signIn} = useAuth();
+  const { error, signIn } = useAuth();
 
   const [loginData, setLoginData] = useState<LoginData>({
     email: '',
@@ -24,9 +25,9 @@ const LoginForm: React.FC = () => {
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setLoginData(prevData => ({
+    setLoginData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -36,7 +37,11 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs" sx={{margin: 'auto', mt: "10%" }}>
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{ margin: 'auto', mt: '10%' }}
+    >
       <Box
         sx={{
           display: 'flex',
@@ -52,7 +57,12 @@ const LoginForm: React.FC = () => {
             {error}
           </Alert>
         )}
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          noValidate
+          sx={{ mt: 1, width: '100%' }}
+        >
           <TextField
             margin="normal"
             required
