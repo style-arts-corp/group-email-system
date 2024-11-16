@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -48,8 +47,8 @@ const EmailForm: React.FC = () => {
   const [targetAddressList, setTargetAddressList] = useState<
     Array<TargetAddressDataType | null>
   >([]);
-  const [recipient, setRecipient] = useState('');
-  const [cc, setCc] = useState('');
+  // const [recipient, setRecipient] = useState('');
+  // const [cc, setCc] = useState('');
 
   const [ccList, setCcList] = useState<string[]>([]);
   const [newCc, setNewCc] = useState('');
@@ -59,7 +58,7 @@ const EmailForm: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState({ recipient: false, body: false });
   const [openWarning, setOpenWarning] = useState(false);
-  const [warningMessage] = useState('');
+  // const [warningMessage, setWarningMessage] = useState('');
 
   const { SuccessDialog, showSuccessDialog } = useSuccessDialog();
 
@@ -84,14 +83,14 @@ const EmailForm: React.FC = () => {
     fetchData(gspreadID);
   };
 
-  const handleRecipientChange = (event: SelectChangeEvent) => {
-    setRecipient(event.target.value);
-    setErrors((prev) => ({ ...prev, recipient: false }));
-  };
+  // const handleRecipientChange = (event: SelectChangeEvent) => {
+  //   setRecipient(event.target.value);
+  //   setErrors((prev) => ({ ...prev, recipient: false }));
+  // };
 
-  const handleCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCc(event.target.value);
-  };
+  // const handleCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setCc(event.target.value);
+  // };
 
   const handleAddCc = () => {
     if (newCc.trim() !== '' && !ccList.includes(newCc.trim())) {
@@ -130,15 +129,14 @@ const EmailForm: React.FC = () => {
     setFiles(files.filter((file) => file !== fileToRemove));
   };
 
-  const validateForm = (): boolean => {
-    const newErrors = {
-      recipient: recipient.trim() === '',
-      body: body.trim() === '',
-    };
-    setErrors(newErrors);
-
-    return !newErrors.recipient && !newErrors.body;
-  };
+  // const validateForm = (): boolean => {
+  //   const newErrors = {
+  //     recipient: recipient.trim() === '',
+  //     body: body.trim() === '',
+  //   };
+  //   setErrors(newErrors);
+  //   return !newErrors.recipient && !newErrors.body;
+  // };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -156,7 +154,7 @@ const EmailForm: React.FC = () => {
       await processToSendEmail(targetAddressList, ccList, subject, body);
       showSuccessDialog();
     };
-    console.log('メールを送信:', { targetAddressList, cc, body, files });
+    console.log('メールを送信:', { targetAddressList, body, files });
     pushData();
   };
 
@@ -293,8 +291,8 @@ const EmailForm: React.FC = () => {
       </Stack>
 
       <WarningDialog
-        message={warningMessage}
         open={openWarning}
+        message={'メールを送信しますか？'}
         onClose={handleCloseWarning}
         onConfirm={handleConfirmSend}
       />

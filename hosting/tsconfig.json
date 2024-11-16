@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "vite/client"],
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": true,
@@ -22,7 +22,7 @@
     "verbatimModuleSyntax": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
   },
   "include": ["src", "*.ts", "*.tsx"],
   "exclude": ["vite.config.ts"],
