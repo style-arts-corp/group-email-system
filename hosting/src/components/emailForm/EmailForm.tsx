@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -129,6 +128,15 @@ const EmailForm: React.FC = () => {
   const handleRemoveFile = (fileToRemove: File) => {
     setFiles(files.filter((file) => file !== fileToRemove));
   };
+
+  // const validateForm = (): boolean => {
+  //   const newErrors = {
+  //     recipient: recipient.trim() === '',
+  //     body: body.trim() === '',
+  //   };
+  //   setErrors(newErrors);
+  //   return !newErrors.recipient && !newErrors.body;
+  // };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -284,7 +292,7 @@ const EmailForm: React.FC = () => {
 
       <WarningDialog
         open={openWarning}
-        message={"メールを送信しますか？"}
+        message={'メールを送信しますか？'}
         onClose={handleCloseWarning}
         onConfirm={handleConfirmSend}
       />

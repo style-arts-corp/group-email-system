@@ -61,20 +61,27 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "fix": "pnpm run '/.*:fix$/'",
-    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
-    "lint:cache": "eslint 'src/**/*.{js,jsx,ts,tsx}' --cache --cache-strategy=content",
-    "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx}'",
-    "fmt": "prettier --check 'src/**/*.{js,jsx,ts,tsx,html,json}'",
-    "fmt:fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx,html,json}'",
-    "typecheck": "tsc",
-    "spellcheck": "cspell 'src/**/*.{js,jsx,ts,tsx,html,json}' --no-progress",
-    "test": "vitest run",
-    "test:typecheck": "vitest --typecheck.only",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

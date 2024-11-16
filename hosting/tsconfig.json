@@ -16,13 +16,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "noErrorTruncation": true,
-    "baseUrl": ".",
-    "verbatimModuleSyntax": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    },
+    "jsx": "react-jsx"
   },
   "include": ["src", "*.ts", "*.tsx"],
   "exclude": ["vite.config.ts"],
