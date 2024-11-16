@@ -1,6 +1,6 @@
 import { off } from "process";
 import apiClient from "./apiClient";
-import { TargetAddressDataType } from "../components/main/Main";
+import { TargetAddressDataType } from "../components/emailForm/EmailForm";
 
 type EmailDataType = {
   target_list: (TargetAddressDataType | null)[];

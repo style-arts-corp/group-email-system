@@ -10,7 +10,6 @@ const LoginPage = () => {
       {user?
         <Navigate to={"/"} />:
         <>
-          <Header />
           <LoginForm/>
         </>
       }
