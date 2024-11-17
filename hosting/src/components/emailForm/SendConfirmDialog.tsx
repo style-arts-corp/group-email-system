@@ -6,16 +6,33 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Divider,
+  Chip,
 } from '@mui/material';
 
-interface OKNODialogProps {
+import type { TargetAddressDataType } from '@/components/emailForm/EmailForm';
+
+interface SendConfirmDialogProps {
+  // state
   open: boolean;
+  // content
+  targetAddressList: Array<TargetAddressDataType | null>;
+  ccList: string[];
+  subject: string;
+  body: string;
+  files: File[];
+  // handler
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-export const SendConfirmDialog: React.FC<OKNODialogProps> = ({
+export const SendConfirmDialog: React.FC<SendConfirmDialogProps> = ({
   open,
+  targetAddressList,
+  ccList,
+  subject,
+  body,
+  files,
   onConfirm,
   onCancel,
 }) => {
@@ -30,7 +47,10 @@ export const SendConfirmDialog: React.FC<OKNODialogProps> = ({
         メール送信内容確認
       </DialogTitle>
       <DialogContent>
-        <DialogContentText id="send-confirm-dialog-description">
+        <DialogContentText
+          id="send-confirm-dialog-description"
+          sx={{ marginBottom: '20px' }}
+        >
           以下の内容で、本当に送信しますか？
         </DialogContentText>
       </DialogContent>

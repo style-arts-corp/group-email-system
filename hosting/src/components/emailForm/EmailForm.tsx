@@ -48,7 +48,6 @@ const EmailForm: React.FC = () => {
     Array<TargetAddressDataType | null>
   >([]);
   // const [recipient, setRecipient] = useState('');
-  // const [cc, setCc] = useState('');
 
   const [ccList, setCcList] = useState<string[]>([]);
   const [newCc, setNewCc] = useState('');
@@ -286,6 +285,11 @@ const EmailForm: React.FC = () => {
 
       <SendConfirmDialog
         open={openSendConfirmDialog}
+        targetAddressList={targetAddressList}
+        ccList={ccList}
+        subject={subject}
+        body={body}
+        files={files}
         onConfirm={sendEmail}
         onCancel={() => setOpenSendConfirmDialog(false)}
       />
