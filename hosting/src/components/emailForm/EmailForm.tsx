@@ -9,6 +9,7 @@ import {
   TextField,
   Stack,
   Chip,
+  FormHelperText,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -38,26 +39,43 @@ export type TargetAddressDataType = {
 };
 // ========== ▲ EmailFormコンポーネントの定義 ▲ ==========
 
+// ========== ▼ FormErrorsの型定義 ▼ ==========
+interface FormErrors {
+  gspread: boolean;
+  body: boolean;
+  subject: boolean;
+}
+// ========== ▲ FormErrorsの型定義 ▲ ==========
+
 const EmailForm: React.FC = () => {
+  // gspread
   const [gspreadList, setGspreadList] = useState<GspreadIMetaDataType[] | null>(
     [],
   );
   const [targetGspreadData, setTargetGspreadData] =
     useState<GspreadIMetaDataType | null>();
+
+  // send target
   const [targetAddressList, setTargetAddressList] = useState<
     Array<TargetAddressDataType | null>
   >([]);
-  // const [recipient, setRecipient] = useState('');
-
+  // cc
   const [ccList, setCcList] = useState<string[]>([]);
   const [newCc, setNewCc] = useState('');
-
+  // subject and body
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  // file
   const [files, setFiles] = useState<File[]>([]);
-  const [errors, setErrors] = useState({ recipient: false, body: false });
-  // const [warningMessage, setWarningMessage] = useState('');
 
+  // form errors
+  const [formErrors, setFormErrors] = useState<FormErrors>({
+    gspread: false,
+    body: false,
+    subject: false,
+  });
+
+  // dialog
   const [openSendConfirmDialog, setOpenSendConfirmDialog] = useState(false);
   const { SuccessDialog, showSuccessDialog } = useSuccessDialog();
 
@@ -70,6 +88,7 @@ const EmailForm: React.FC = () => {
     fetchData();
   }, []);
 
+  // functions of gspread / address list
   const handleGspreadChange = (event: SelectChangeEvent) => {
     const fetchData = async (id: string) => {
       const data = await getGspreadDataByID(id);
@@ -82,37 +101,28 @@ const EmailForm: React.FC = () => {
     fetchData(gspreadID);
   };
 
-  // const handleRecipientChange = (event: SelectChangeEvent) => {
-  //   setRecipient(event.target.value);
-  //   setErrors((prev) => ({ ...prev, recipient: false }));
-  // };
-
-  // const handleCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setCc(event.target.value);
-  // };
-
+  // functions for cc
   const handleAddCc = () => {
     if (newCc.trim() !== '' && !ccList.includes(newCc.trim())) {
       setCcList([...ccList, newCc.trim()]);
       setNewCc('');
     }
   };
-
   const handleRemoveCc = (ccToRemove: string) => {
     setCcList(ccList.filter((cc) => cc !== ccToRemove));
   };
-
   const handleNewCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewCc(event.target.value);
   };
 
+  // functions for subject
   const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSubject(event.target.value);
   };
 
+  // functions for body
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
-    setErrors((prev) => ({ ...prev, body: false }));
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,15 +137,6 @@ const EmailForm: React.FC = () => {
   const handleRemoveFile = (fileToRemove: File) => {
     setFiles(files.filter((file) => file !== fileToRemove));
   };
-
-  // const validateForm = (): boolean => {
-  //   const newErrors = {
-  //     recipient: recipient.trim() === '',
-  //     body: body.trim() === '',
-  //   };
-  //   setErrors(newErrors);
-  //   return !newErrors.recipient && !newErrors.body;
-  // };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -185,7 +186,6 @@ const EmailForm: React.FC = () => {
               )
             : null}
         </Select>
-        {/* {errors.recipient && <Typography color="error">送信先を選択してください</Typography>} */}
       </FormControl>
 
       <Box sx={{ mt: 1 }}>
@@ -233,8 +233,6 @@ const EmailForm: React.FC = () => {
       />
 
       <TextField
-        error={errors.body}
-        helperText={errors.body ? '本文を入力してください' : ''}
         id="body"
         label="本文"
         margin="normal"
