@@ -10,16 +10,12 @@ import {
 
 interface OKNODialogProps {
   open: boolean;
-  title: string;
-  message: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 export const SendConfirmDialog: React.FC<OKNODialogProps> = ({
   open,
-  title,
-  message,
   onConfirm,
   onCancel,
 }) => {
@@ -30,15 +26,17 @@ export const SendConfirmDialog: React.FC<OKNODialogProps> = ({
       aria-labelledby="send-confirm-dialog-title"
       aria-describedby="send-confirm-dialog-description"
     >
-      <DialogTitle id="send-confirm-dialog-title">{title}</DialogTitle>
+      <DialogTitle id="send-confirm-dialog-title">
+        メール送信内容確認
+      </DialogTitle>
       <DialogContent>
         <DialogContentText id="send-confirm-dialog-description">
-          {message}
+          以下の内容で、本当に送信しますか？
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel} color="primary">
-          いいえ
+          キャンセル
         </Button>
         <Button
           onClick={onConfirm}
@@ -46,7 +44,7 @@ export const SendConfirmDialog: React.FC<OKNODialogProps> = ({
           variant="contained"
           autoFocus
         >
-          はい
+          送信
         </Button>
       </DialogActions>
     </Dialog>

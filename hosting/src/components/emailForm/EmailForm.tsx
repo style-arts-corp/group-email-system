@@ -286,8 +286,6 @@ const EmailForm: React.FC = () => {
 
       <SendConfirmDialog
         open={openSendConfirmDialog}
-        title="メール送信確認"
-        message="メールを送信しますか？"
         onConfirm={sendEmail}
         onCancel={() => setOpenSendConfirmDialog(false)}
       />
