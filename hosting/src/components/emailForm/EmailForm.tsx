@@ -39,14 +39,6 @@ export type TargetAddressDataType = {
 };
 // ========== ▲ EmailFormコンポーネントの定義 ▲ ==========
 
-// ========== ▼ FormErrorsの型定義 ▼ ==========
-interface FormErrors {
-  gspread: boolean;
-  body: boolean;
-  subject: boolean;
-}
-// ========== ▲ FormErrorsの型定義 ▲ ==========
-
 const EmailForm: React.FC = () => {
   // gspread
   const [gspreadList, setGspreadList] = useState<GspreadIMetaDataType[] | null>(
@@ -69,11 +61,9 @@ const EmailForm: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
 
   // form errors
-  const [formErrors, setFormErrors] = useState<FormErrors>({
-    gspread: false,
-    body: false,
-    subject: false,
-  });
+  const [gspreadFormError, setGspreadFormError] = useState(false);
+  const [subjectFormError, setSubjectFormError] = useState(false);
+  const [bodyFormError, setBodyFormError] = useState(false);
 
   // dialog
   const [openSendConfirmDialog, setOpenSendConfirmDialog] = useState(false);
@@ -99,6 +89,7 @@ const EmailForm: React.FC = () => {
     if (gspreadList === null) return;
     setTargetGspreadData(gspreadList.find((item) => item.id === gspreadID));
     fetchData(gspreadID);
+    if (targetGspreadData) setGspreadFormError(false);
   };
 
   // functions for cc
@@ -118,11 +109,13 @@ const EmailForm: React.FC = () => {
   // functions for subject
   const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSubject(event.target.value);
+    if (subject) setSubjectFormError(false);
   };
 
   // functions for body
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
+    if (body) setBodyFormError(false);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,8 +131,31 @@ const EmailForm: React.FC = () => {
     setFiles(files.filter((file) => file !== fileToRemove));
   };
 
+  const validateForm = (): boolean => {
+    let res = true;
+    // スプレッドシートの選択チェック
+    if (!targetGspreadData) {
+      setGspreadFormError(true);
+      res = false;
+    }
+    // 件名のチェック
+    if (!subject.trim()) {
+      setSubjectFormError(true);
+      res = false;
+    }
+    // 本文のチェック
+    if (!body.trim()) {
+      setBodyFormError(true);
+      res = false;
+    }
+    return res;
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     console.log('メールを送信');
     setOpenSendConfirmDialog(true);
   };
@@ -152,6 +168,14 @@ const EmailForm: React.FC = () => {
       console.log(body);
       // ここでsendEmailのAPIを叩く処理を実装します
       await processToSendEmail(targetAddressList, ccList, subject, body);
+      // フォームのリセット
+      setTargetGspreadData(null);
+      setTargetAddressList([]);
+      setCcList([]);
+      setSubject('');
+      setBody('');
+      setFiles([]);
+      // 送信完了ダイアログを表示
       showSuccessDialog();
     };
     console.log('メールを送信:', { targetAddressList, body, files });
@@ -186,6 +210,14 @@ const EmailForm: React.FC = () => {
               )
             : null}
         </Select>
+        {
+          // エラーメッセージ
+          gspreadFormError ? (
+            <FormHelperText sx={{ color: 'red', fontSize: '0.8rem' }}>
+              対象スプレッドシートを選択してください
+            </FormHelperText>
+          ) : null
+        }
       </FormControl>
 
       <Box sx={{ mt: 1 }}>
@@ -230,6 +262,8 @@ const EmailForm: React.FC = () => {
         value={subject}
         fullWidth
         onChange={handleSubjectChange}
+        error={subjectFormError}
+        helperText={subjectFormError ? '件名を入力してください' : ''}
       />
 
       <TextField
@@ -241,6 +275,8 @@ const EmailForm: React.FC = () => {
         fullWidth
         multiline
         onChange={handleBodyChange}
+        error={bodyFormError}
+        helperText={bodyFormError ? '本文を入力してください' : ''}
       />
 
       <Box sx={{ mt: 2, mb: 2 }}>
