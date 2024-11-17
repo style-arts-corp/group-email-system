@@ -18,7 +18,7 @@ import getGspreadDataByID from '@/api/getGspreadDataByID';
 import getGspreadList from '@/api/getGspreadList';
 import processToSendEmail from '@/api/processToSendEmail';
 import useSuccessDialog from './SuccessDialog';
-import WarningDialog from './WarningDialog'; // パスは適切に調整してください
+import { SendConfirmDialog } from '@/components/emailForm/SendConfirmDialog';
 
 // ========== ▼ スプシメタデータに関する定義 ▼ ==========
 type GspreadIMetaDataType = {
@@ -57,9 +57,9 @@ const EmailForm: React.FC = () => {
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState({ recipient: false, body: false });
-  const [openWarning, setOpenWarning] = useState(false);
   // const [warningMessage, setWarningMessage] = useState('');
 
+  const [openSendConfirmDialog, setOpenSendConfirmDialog] = useState(false);
   const { SuccessDialog, showSuccessDialog } = useSuccessDialog();
 
   useEffect(() => {
@@ -141,7 +141,7 @@ const EmailForm: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log('メールを送信');
-    sendEmail();
+    setOpenSendConfirmDialog(true);
   };
 
   const sendEmail = () => {
@@ -156,15 +156,7 @@ const EmailForm: React.FC = () => {
     };
     console.log('メールを送信:', { targetAddressList, body, files });
     pushData();
-  };
-
-  const handleCloseWarning = () => {
-    setOpenWarning(false);
-  };
-
-  const handleConfirmSend = () => {
-    setOpenWarning(false);
-    sendEmail();
+    setOpenSendConfirmDialog(false);
   };
 
   return (
@@ -290,14 +282,15 @@ const EmailForm: React.FC = () => {
         </Button>
       </Stack>
 
-      <WarningDialog
-        open={openWarning}
-        message={'メールを送信しますか？'}
-        onClose={handleCloseWarning}
-        onConfirm={handleConfirmSend}
-      />
-
       <SuccessDialog />
+
+      <SendConfirmDialog
+        open={openSendConfirmDialog}
+        title="メール送信確認"
+        message="メールを送信しますか？"
+        onConfirm={sendEmail}
+        onCancel={() => setOpenSendConfirmDialog(false)}
+      />
     </Box>
   );
 };
