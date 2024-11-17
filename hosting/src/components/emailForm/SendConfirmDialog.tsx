@@ -49,9 +49,67 @@ export const SendConfirmDialog: React.FC<SendConfirmDialogProps> = ({
       <DialogContent>
         <DialogContentText
           id="send-confirm-dialog-description"
-          sx={{ marginBottom: '20px' }}
+          sx={{ marginBottom: '40px' }}
         >
           以下の内容で、本当に送信しますか？
+        </DialogContentText>
+        <Divider textAlign="center">送信先</Divider>
+        <DialogContentText
+          id="send-confirm-dialog-description"
+          sx={{ marginBottom: '20px' }}
+        >
+          {targetAddressList.map((targetAddress, index) => (
+            <Chip
+              key={index}
+              label={targetAddress?.email}
+              sx={{ margin: '5px', fontSize: '10px' }}
+            />
+          ))}
+        </DialogContentText>
+        <Divider textAlign="center">cc</Divider>
+        <DialogContentText
+          id="send-confirm-dialog-description"
+          sx={{ marginBottom: '20px' }}
+        >
+          {ccList.map((ccAddress, index) => (
+            <Chip
+              key={index}
+              label={ccAddress}
+              sx={{ margin: '5px', fontSize: '10px' }}
+            />
+          ))}
+        </DialogContentText>
+        <Divider textAlign="center">件名</Divider>
+        <DialogContentText
+          id="send-confirm-dialog-description"
+          sx={{
+            marginBottom: '20px',
+            textAlign: 'center',
+            fontSize: '20px',
+            fontWeight: 'bold',
+          }}
+        >
+          {subject}
+        </DialogContentText>
+        <Divider textAlign="center">本文</Divider>
+        <DialogContentText
+          id="send-confirm-dialog-description"
+          sx={{ marginBottom: '20px' }}
+        >
+          {body}
+        </DialogContentText>
+        <Divider textAlign="center">添付ファイル</Divider>
+        <DialogContentText
+          id="send-confirm-dialog-description"
+          sx={{ marginBottom: '20px' }}
+        >
+          {files.map((file, index) => (
+            <Chip
+              key={index}
+              label={file.name}
+              sx={{ margin: '5px', fontSize: '10px' }}
+            />
+          ))}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
