@@ -12,7 +12,6 @@ type EmailDataType = {
   cc_list: Array<string | null>;
   subject: string;
   content: string;
-  // files: AttachmentFileType[];
 };
 
 const processToSendEmail = async (
@@ -20,33 +19,26 @@ const processToSendEmail = async (
   ccList: Array<string | null>,
   subject: string,
   content: string,
-  files: File[] = [],
+  file?: File | null,
 ) => {
-  const processedAttachmentFiles: AttachmentFileType[] = await Promise.all(
-    files.map(async (file) => {
-      const buffer = await file.arrayBuffer();
-      return {
-        name: file.name,
-        content: buffer,
-        type: file.type,
-      };
-    }),
-  );
-  console.log(processedAttachmentFiles);
-
   const data: EmailDataType = {
     target_list: targetList,
     cc_list: ccList,
     subject: subject,
     content: content,
-    // files: processedAttachmentFiles,
   };
 
-  const response = await apiClient.post(`/process_send_email`, data, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  const formData = new FormData();
+  formData.append('emailData', JSON.stringify(data));
+  if (file) formData.append('attachmentFile', file, file.name);
+
+  // FormDataの内容を確認
+  console.log('FormData contents:');
+  for (const pair of formData.entries()) {
+    console.log(pair[0], pair[1]);
+  }
+
+  const response = await apiClient.post(`/process_send_email`, formData);
 
   return response.data;
 };
