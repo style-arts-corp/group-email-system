@@ -167,7 +167,7 @@ const EmailForm: React.FC = () => {
       console.log(subject);
       console.log(body);
       // ここでsendEmailのAPIを叩く処理を実装します
-      await processToSendEmail(targetAddressList, ccList, subject, body);
+      await processToSendEmail(targetAddressList, ccList, subject, body, files);
       // フォームのリセット
       setTargetGspreadData(null);
       setTargetAddressList([]);
