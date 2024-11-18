@@ -9,6 +9,7 @@ import {
   TextField,
   Stack,
   Chip,
+  FormHelperText,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -39,25 +40,32 @@ export type TargetAddressDataType = {
 // ========== ▲ EmailFormコンポーネントの定義 ▲ ==========
 
 const EmailForm: React.FC = () => {
+  // gspread
   const [gspreadList, setGspreadList] = useState<GspreadIMetaDataType[] | null>(
     [],
   );
   const [targetGspreadData, setTargetGspreadData] =
     useState<GspreadIMetaDataType | null>();
+
+  // send target
   const [targetAddressList, setTargetAddressList] = useState<
     Array<TargetAddressDataType | null>
   >([]);
-  // const [recipient, setRecipient] = useState('');
-
+  // cc
   const [ccList, setCcList] = useState<string[]>([]);
   const [newCc, setNewCc] = useState('');
-
+  // subject and body
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  // file
   const [files, setFiles] = useState<File[]>([]);
-  const [errors, setErrors] = useState({ recipient: false, body: false });
-  // const [warningMessage, setWarningMessage] = useState('');
 
+  // form errors
+  const [gspreadFormError, setGspreadFormError] = useState(false);
+  const [subjectFormError, setSubjectFormError] = useState(false);
+  const [bodyFormError, setBodyFormError] = useState(false);
+
+  // dialog
   const [openSendConfirmDialog, setOpenSendConfirmDialog] = useState(false);
   const { SuccessDialog, showSuccessDialog } = useSuccessDialog();
 
@@ -70,6 +78,7 @@ const EmailForm: React.FC = () => {
     fetchData();
   }, []);
 
+  // functions of gspread / address list
   const handleGspreadChange = (event: SelectChangeEvent) => {
     const fetchData = async (id: string) => {
       const data = await getGspreadDataByID(id);
@@ -80,39 +89,33 @@ const EmailForm: React.FC = () => {
     if (gspreadList === null) return;
     setTargetGspreadData(gspreadList.find((item) => item.id === gspreadID));
     fetchData(gspreadID);
+    if (targetGspreadData) setGspreadFormError(false);
   };
 
-  // const handleRecipientChange = (event: SelectChangeEvent) => {
-  //   setRecipient(event.target.value);
-  //   setErrors((prev) => ({ ...prev, recipient: false }));
-  // };
-
-  // const handleCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setCc(event.target.value);
-  // };
-
+  // functions for cc
   const handleAddCc = () => {
     if (newCc.trim() !== '' && !ccList.includes(newCc.trim())) {
       setCcList([...ccList, newCc.trim()]);
       setNewCc('');
     }
   };
-
   const handleRemoveCc = (ccToRemove: string) => {
     setCcList(ccList.filter((cc) => cc !== ccToRemove));
   };
-
   const handleNewCcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewCc(event.target.value);
   };
 
+  // functions for subject
   const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSubject(event.target.value);
+    if (subject) setSubjectFormError(false);
   };
 
+  // functions for body
   const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
-    setErrors((prev) => ({ ...prev, body: false }));
+    if (body) setBodyFormError(false);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,17 +131,31 @@ const EmailForm: React.FC = () => {
     setFiles(files.filter((file) => file !== fileToRemove));
   };
 
-  // const validateForm = (): boolean => {
-  //   const newErrors = {
-  //     recipient: recipient.trim() === '',
-  //     body: body.trim() === '',
-  //   };
-  //   setErrors(newErrors);
-  //   return !newErrors.recipient && !newErrors.body;
-  // };
+  const validateForm = (): boolean => {
+    let res = true;
+    // スプレッドシートの選択チェック
+    if (!targetGspreadData) {
+      setGspreadFormError(true);
+      res = false;
+    }
+    // 件名のチェック
+    if (!subject.trim()) {
+      setSubjectFormError(true);
+      res = false;
+    }
+    // 本文のチェック
+    if (!body.trim()) {
+      setBodyFormError(true);
+      res = false;
+    }
+    return res;
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     console.log('メールを送信');
     setOpenSendConfirmDialog(true);
   };
@@ -151,6 +168,14 @@ const EmailForm: React.FC = () => {
       console.log(body);
       // ここでsendEmailのAPIを叩く処理を実装します
       await processToSendEmail(targetAddressList, ccList, subject, body);
+      // フォームのリセット
+      setTargetGspreadData(null);
+      setTargetAddressList([]);
+      setCcList([]);
+      setSubject('');
+      setBody('');
+      setFiles([]);
+      // 送信完了ダイアログを表示
       showSuccessDialog();
     };
     console.log('メールを送信:', { targetAddressList, body, files });
@@ -185,7 +210,14 @@ const EmailForm: React.FC = () => {
               )
             : null}
         </Select>
-        {/* {errors.recipient && <Typography color="error">送信先を選択してください</Typography>} */}
+        {
+          // エラーメッセージ
+          gspreadFormError ? (
+            <FormHelperText sx={{ color: 'red', fontSize: '0.8rem' }}>
+              対象スプレッドシートを選択してください
+            </FormHelperText>
+          ) : null
+        }
       </FormControl>
 
       <Box sx={{ mt: 1 }}>
@@ -230,11 +262,11 @@ const EmailForm: React.FC = () => {
         value={subject}
         fullWidth
         onChange={handleSubjectChange}
+        error={subjectFormError}
+        helperText={subjectFormError ? '件名を入力してください' : ''}
       />
 
       <TextField
-        error={errors.body}
-        helperText={errors.body ? '本文を入力してください' : ''}
         id="body"
         label="本文"
         margin="normal"
@@ -243,6 +275,8 @@ const EmailForm: React.FC = () => {
         fullWidth
         multiline
         onChange={handleBodyChange}
+        error={bodyFormError}
+        helperText={bodyFormError ? '本文を入力してください' : ''}
       />
 
       <Box sx={{ mt: 2, mb: 2 }}>
