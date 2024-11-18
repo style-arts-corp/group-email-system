@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
+import json
 
 from firebase_admin import initialize_app, db
 from firebase_functions import https_fn
@@ -52,7 +53,10 @@ def get_gspread_data_by_id():
 def process_send_email():
     if request.method != "POST":
         return "method not allowed", 405
-    data = request.get_json()
+    # email data
+    _buf = request.form.get('emailData')
+    print(f"emailData _buf : {_buf}")
+    data = json.loads(_buf)
     if not data or 'target_list' not in data:
         return "Missing email in JSON body", 400
     target_list = data['target_list']
@@ -63,15 +67,20 @@ def process_send_email():
     print(f"subject: {subject}")
     content = data['content']
     print(f"content: {content}")
+    # file
+    file = request.files.get('attachmentFile')
+    # send email
     for target in target_list:
         send_text = content.replace("{company}", target["company"]).replace("{name}", target["name"]).replace("{role}", target["role"])
         send_email(
-            os.getenv("SENDER_EMAIL"),
-            os.getenv("SENDER_PASSWORD"),
-            target["email"],
-            cc_list,
-            subject,
-            send_text
+            account=os.getenv("ACCOUNT"),
+            account_password=os.getenv("ACCOUNT_PASSWORD"),
+            sender_email=os.getenv("SENDER_EMAIL"),
+            receiver_email=target["email"],
+            cc_list=cc_list,
+            subject=subject,
+            body=send_text,
+            file=file
         )
     return "complete", 200
 
