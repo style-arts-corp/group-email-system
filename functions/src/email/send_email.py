@@ -30,7 +30,7 @@ def send_email(account, account_password, sender_email, receiver_email, cc_list,
             filename=file_name
         )
         message.attach(part)
-        file.close()
+        file.seek(0)
 
     # SMTPサーバーへの接続とメール送信
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
