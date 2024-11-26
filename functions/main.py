@@ -68,7 +68,15 @@ def process_send_email():
     content = data['content']
     print(f"content: {content}")
     # file
-    files = [ request.files.get('attachmentFile') ]
+    file_num = 0
+    files = []
+    while True:
+        file_name = f"attachmentFile{file_num}"
+        _buf = request.files.get(file_name)
+        if _buf is None:
+            break
+        files.append(_buf)
+        file_num += 1
     # send email
     for target in target_list:
         send_text = content.replace("{company}", target["company"]).replace("{name}", target["name"]).replace("{role}", target["role"])
