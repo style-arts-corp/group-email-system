@@ -68,7 +68,7 @@ def process_send_email():
     content = data['content']
     print(f"content: {content}")
     # file
-    file = request.files.get('attachmentFile')
+    files = [ request.files.get('attachmentFile') ]
     # send email
     for target in target_list:
         send_text = content.replace("{company}", target["company"]).replace("{name}", target["name"]).replace("{role}", target["role"])
@@ -80,7 +80,7 @@ def process_send_email():
             cc_list=cc_list,
             subject=subject,
             body=send_text,
-            file=file
+            files=files
         )
     return "complete", 200
 
