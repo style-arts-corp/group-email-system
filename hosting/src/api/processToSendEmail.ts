@@ -19,7 +19,7 @@ const processToSendEmail = async (
   ccList: Array<string | null>,
   subject: string,
   content: string,
-  file?: File | null,
+  files?: Array<File | null>,
 ) => {
   const data: EmailDataType = {
     target_list: targetList,
@@ -30,8 +30,11 @@ const processToSendEmail = async (
 
   const formData = new FormData();
   formData.append('emailData', JSON.stringify(data));
-  if (file) formData.append('attachmentFile', file, file.name);
-
+  if (files) {
+    files.map((file, index) => {
+      if (file) formData.append(`attachmentFile${index}`, file, file.name);
+    });
+  }
   // FormDataの内容を確認
   console.log('FormData contents:');
   for (const pair of formData.entries()) {
